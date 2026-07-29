@@ -1,0 +1,15 @@
+<mine-game-status-bar
+  [minesLeft]="minesLeft()"
+  [elapsed]="elapsed()"
+  [status]="status()"
+  [statusLabel]="statusLabel()"
+/>
+<mine-board-frame [paused]="paused()" />
+<mine-game-controls
+  [message]="statusMessage()"
+  [flagMode]="flagMode()"
+  [paused]="paused()"
+  [pauseEnabled]="pauseEnabled()"
+  (flagModeToggle)="flagModeToggle.emit()"
+  (pauseToggle)="pauseToggle.emit()"
+/>

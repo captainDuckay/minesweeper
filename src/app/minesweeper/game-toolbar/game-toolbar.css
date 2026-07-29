@@ -1,0 +1,110 @@
+:host {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.game-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.difficulty-picker {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.difficulty-button {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: left;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.difficulty-button span {
+  display: block;
+  margin-top: 3px;
+  color: var(--faint);
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+.difficulty-button:hover {
+  color: var(--text);
+}
+
+.difficulty-button.is-active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.difficulty-button.is-active span {
+  color: color-mix(in srgb, var(--accent-ink) 62%, transparent);
+}
+
+.new-game-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.new-game-button:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.new-game-icon {
+  font-size: 17px;
+  line-height: 0;
+}
+
+@media (max-width: 650px) {
+  .game-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .difficulty-picker {
+    width: 100%;
+  }
+
+  .difficulty-button {
+    flex: 1;
+    padding: 8px 5px;
+    font-size: 9px;
+  }
+
+  .new-game-button {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .difficulty-button span {
+    display: none;
+  }
+}

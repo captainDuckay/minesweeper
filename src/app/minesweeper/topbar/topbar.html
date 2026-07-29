@@ -1,0 +1,25 @@
+<header class="topbar">
+  <a class="brand" href="." aria-label="Minesweeper home">
+    <span class="brand-mark" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </span>
+    <span>mine<span class="brand-accent">sweep</span></span>
+  </a>
+  <div class="topbar-actions">
+    <button
+      class="icon-button"
+      type="button"
+      [attr.aria-label]="theme() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+      title="Switch theme"
+      (click)="onToggleTheme()"
+    >
+      <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.5" />
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
+        />
+      </svg>
+    </button>
+    <span class="github-link">Offline edition</span>
+  </div>
+</header>

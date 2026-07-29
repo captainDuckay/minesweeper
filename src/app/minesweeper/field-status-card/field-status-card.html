@@ -1,0 +1,21 @@
+<div class="info-card focus-card">
+  <div class="focus-orbit orbit-one"></div>
+  <div class="focus-orbit orbit-two"></div>
+  <span class="focus-label">Field status</span>
+  <strong>{{ safeRemaining() }}</strong>
+  <span class="focus-caption">safe tiles to find</span>
+  <div class="focus-stats" aria-label="Run statistics">
+    <span class="focus-stat">
+      <strong>{{ runStats().played }}</strong>
+      runs
+    </span>
+    <span class="focus-stat">
+      <strong>{{ runStats().wins }}</strong>
+      clears
+    </span>
+    <span class="focus-stat">
+      <strong>{{ runStats().losses }}</strong>
+      misses
+    </span>
+  </div>
+</div>

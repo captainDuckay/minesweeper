@@ -1,0 +1,20 @@
+<div class="game-toolbar">
+  <div class="difficulty-picker" role="group" aria-label="Choose difficulty">
+    @for (entry of difficultyEntries(); track entry[0]) {
+      <button
+        class="difficulty-button"
+        type="button"
+        [class.is-active]="difficulty() === entry[0]"
+        [attr.aria-pressed]="difficulty() === entry[0]"
+        (click)="onDifficulty(entry[0])"
+      >
+        {{ entry[1].label }}
+        <span>{{ formatSize(entry[1].rows, entry[1].columns) }}</span>
+      </button>
+    }
+  </div>
+  <button class="new-game-button" type="button" (click)="onNewGame()">
+    <span class="new-game-icon" aria-hidden="true">↻</span>
+    New game
+  </button>
+</div>

@@ -1,0 +1,28 @@
+<div class="game-card-footer">
+  <p>{{ message() }}</p>
+  <div class="footer-actions">
+    <button
+      class="text-button"
+      type="button"
+      [attr.aria-pressed]="flagMode()"
+      (click)="onFlagMode()"
+    >
+      <span class="flag-glyph" aria-hidden="true">⚑</span>
+      Flag mode: {{ flagMode() ? 'on' : 'off' }}
+    </button>
+    <button
+      class="text-button"
+      type="button"
+      [disabled]="!pauseEnabled()"
+      (click)="onPause()"
+    >
+      @if (paused()) {
+        <span class="pause-glyph" aria-hidden="true">▶</span>
+        Resume
+      } @else {
+        <span class="pause-glyph" aria-hidden="true">Ⅱ</span>
+        Pause
+      }
+    </button>
+  </div>
+</div>

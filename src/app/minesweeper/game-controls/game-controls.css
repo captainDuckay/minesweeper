@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.game-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 24px;
+}
+
+.game-card-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.text-button:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.text-button[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.text-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.flag-glyph {
+  font-size: 15px;
+  vertical-align: -1px;
+}
+
+.pause-glyph {
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .game-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .footer-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

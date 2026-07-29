@@ -1,0 +1,15 @@
+@for (cell of session.game().cells; track cell.index) {
+  <mine-cell
+    [cell]="cell"
+    [columns]="session.game().columns"
+    [explodedIndex]="session.game().explodedIndex"
+    [status]="session.game().status"
+    [tabIndex]="tabIndexFor(cell.index)"
+    (primaryAction)="onPrimaryAction($event)"
+    (flagAction)="onFlag($event)"
+    (keydown)="onKeydown($event, cell.index)"
+    (pointerDown)="onPointerDown($event, cell.index)"
+    (pointerUp)="onPointerEnd($event, cell.index)"
+    (pointerCancel)="onPointerEnd($event, cell.index)"
+  />
+}

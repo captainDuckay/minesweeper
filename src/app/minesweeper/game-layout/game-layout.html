@@ -1,0 +1,32 @@
+<section class="game-layout" aria-label="Minesweeper game">
+  <div class="game-column">
+    <mine-game-toolbar
+      [difficulty]="session.difficulty()"
+      [difficultyEntries]="difficultyEntries"
+      (difficultyChange)="setDifficulty($event)"
+      (newGame)="session.reset()"
+    />
+    <mine-game-card
+      [won]="session.isWon()"
+      [minesLeft]="session.minesRemainingLabel()"
+      [elapsed]="session.elapsedLabel()"
+      [status]="session.status()"
+      [statusLabel]="session.statusDetail().label"
+      [statusMessage]="session.statusDetail().message"
+      [paused]="session.isPaused()"
+      [flagMode]="session.flagMode()"
+      [pauseEnabled]="session.pauseEnabled()"
+      (flagModeToggle)="session.toggleFlagMode()"
+      (pauseToggle)="session.togglePause()"
+    />
+    <mine-board-hint />
+  </div>
+
+  <mine-info-column
+    [bestTimeLabel]="session.bestTimeLabel()"
+    [bestCopy]="session.bestCopy()"
+    [meterPercent]="session.bestMeterPercent()"
+    [safeRemaining]="session.safeRemaining()"
+    [runStats]="session.currentRunStats()"
+  />
+</section>

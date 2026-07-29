@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 19px 0 26px;
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.footer-line {
+  width: 28px;
+  height: 1px;
+  background: var(--line-bright);
+}
+
+.site-footer .mono {
+  margin-left: auto;
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+}
+
+@media (max-width: 650px) {
+  .site-footer {
+    margin-top: 10px;
+  }
+}

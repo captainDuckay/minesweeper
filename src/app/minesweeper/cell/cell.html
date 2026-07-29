@@ -1,0 +1,20 @@
+<button
+  type="button"
+  role="gridcell"
+  [class]="classList()"
+  [attr.data-index]="cell().index"
+  [attr.data-number]="cell().adjacentMines"
+  [attr.aria-rowindex]="row()"
+  [attr.aria-colindex]="column()"
+  [attr.aria-label]="label()"
+  aria-keyshortcuts="F Enter ArrowLeft ArrowRight ArrowUp ArrowDown"
+  [attr.tabindex]="tabIndex()"
+  (click)="onPrimaryAction()"
+  (contextmenu)="onContextMenu($event)"
+  (keydown)="onKeydown($event)"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel($event)"
+>
+  {{ display() }}
+</button>

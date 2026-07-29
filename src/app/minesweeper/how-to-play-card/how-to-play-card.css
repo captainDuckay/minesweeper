@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.info-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.how-card {
+  padding-bottom: 16px;
+}
+
+.how-list {
+  display: grid;
+  gap: 17px;
+  margin: 23px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.how-list li {
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.how-list li > span {
+  color: var(--accent);
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+}
+
+.how-list p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.tip {
+  display: flex;
+  gap: 8px;
+  padding: 11px;
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+
+.tip > span {
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.tip p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.tip strong {
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  :host {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 650px) {
+  :host {
+    grid-column: span 2;
+  }
+}

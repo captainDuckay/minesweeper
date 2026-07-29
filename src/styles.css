@@ -1,1 +1,94 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: dark;
+  --bg: #10141d;
+  --bg-deep: #0c1017;
+  --surface: #171d29;
+  --surface-raised: #1b2230;
+  --surface-soft: #202838;
+  --line: rgba(175, 190, 213, 0.13);
+  --line-bright: rgba(175, 190, 213, 0.23);
+  --text: #f2f5f8;
+  --muted: #8e9aac;
+  --faint: #5a6678;
+  --accent: #c9f26d;
+  --accent-strong: #aade40;
+  --accent-ink: #202d16;
+  --coral: #ff836e;
+  --blue: #82c6ff;
+  --violet: #c3a8ff;
+  --cell: #293445;
+  --cell-hover: #334157;
+  --cell-revealed: #202938;
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.2);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f2f4ef;
+  --bg-deep: #e7ebe4;
+  --surface: #ffffff;
+  --surface-raised: #f9fbf8;
+  --surface-soft: #edf1ea;
+  --line: rgba(35, 47, 37, 0.13);
+  --line-bright: rgba(35, 47, 37, 0.23);
+  --text: #182018;
+  --muted: #69766a;
+  --faint: #9ca99d;
+  --accent: #75a91f;
+  --accent-strong: #5c8b12;
+  --accent-ink: #fbfff4;
+  --coral: #d95542;
+  --blue: #3986c5;
+  --violet: #7959c4;
+  --cell: #dce5d8;
+  --cell-hover: #d2dfcd;
+  --cell-revealed: #f3f6f1;
+  --shadow: 0 22px 70px rgba(67, 85, 65, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at 12% 0%, rgba(201, 242, 109, 0.06), transparent 29rem),
+    var(--bg);
+  color: var(--text);
+  font-family: "Avenir Next", "Inter", system-ui, sans-serif;
+  transition: background 220ms ease, color 220ms ease;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+:host(.is-won) {
+  animation: celebrate 500ms ease;
+}
+
+@keyframes celebrate {
+  from {
+    transform: scale(0.97);
+  }
+  to {
+    transform: scale(1);
+  }
+}

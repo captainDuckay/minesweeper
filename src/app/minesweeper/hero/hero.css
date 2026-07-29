@@ -1,0 +1,66 @@
+:host {
+  display: block;
+  margin-bottom: 50px;
+}
+
+.hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 44px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 13%, transparent);
+}
+
+h1 {
+  max-width: 700px;
+  margin: 0;
+  font-size: clamp(42px, 5.3vw, 75px);
+  line-height: 0.98;
+  letter-spacing: -0.075em;
+}
+
+h1 em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.hero-copy {
+  max-width: 280px;
+  margin: 0 0 3px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+@media (max-width: 650px) {
+  :host {
+    margin-bottom: 35px;
+  }
+
+  .hero {
+    display: block;
+  }
+
+  .hero-copy {
+    margin-top: 20px;
+  }
+}

@@ -1,0 +1,8 @@
+<div class="info-card best-card">
+  <mine-info-card-heading icon="✦" label="Your best" [showSparkle]="true" />
+  <div class="best-time mono">{{ bestTimeLabel() }}</div>
+  <p>{{ bestCopy() }}</p>
+  <div class="best-meter">
+    <span [style.width.%]="meterPercent()"></span>
+  </div>
+</div>

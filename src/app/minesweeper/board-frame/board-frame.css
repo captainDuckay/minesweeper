@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.board-frame {
+  padding: 22px;
+  background: var(--bg-deep);
+}
+
+.board-wrap {
+  position: relative;
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--bg-deep);
+  scrollbar-color: var(--cell-hover) transparent;
+}
+
+@media (max-width: 650px) {
+  .board-frame {
+    padding: 11px;
+  }
+}
