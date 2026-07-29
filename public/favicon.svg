@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Minesweeper">
+  <!-- Matches topbar .brand-mark: 2×2 cells, rotate 45°, opposite filled -->
+  <rect width="32" height="32" rx="7" fill="#10141d"/>
+  <g transform="translate(16 16) rotate(45)">
+    <!-- hollow -->
+    <rect x="-7.5" y="-7.5" width="6" height="6" rx="1.2" fill="none" stroke="#c9f26d" stroke-width="1.5"/>
+    <!-- filled (nth 2) -->
+    <rect x="1.5" y="-7.5" width="6" height="6" rx="1.2" fill="#c9f26d"/>
+    <!-- filled (nth 3) -->
+    <rect x="-7.5" y="1.5" width="6" height="6" rx="1.2" fill="#c9f26d"/>
+    <!-- hollow -->
+    <rect x="1.5" y="1.5" width="6" height="6" rx="1.2" fill="none" stroke="#c9f26d" stroke-width="1.5"/>
+  </g>
+</svg>
