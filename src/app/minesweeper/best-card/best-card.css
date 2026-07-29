@@ -11,6 +11,28 @@
   background: var(--surface);
 }
 
+.info-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.heading-icon {
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.sparkle {
+  margin-left: auto;
+  color: var(--faint);
+  font-size: 18px;
+}
+
 .best-time {
   margin: 24px 0 5px;
   color: var(--text);

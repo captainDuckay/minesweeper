@@ -1,10 +1,14 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { CLOCK } from './clock';
 import { DIFFICULTIES } from './constants';
+import { STATUS_DETAILS } from './constants';
 import {
   chordCell,
   createGame,
   getCurrentElapsedSeconds,
+  getMinesRemaining,
+  getSafeRemaining,
+  isTerminalStatus,
   pauseGame,
   resumeGame,
   revealCell,
@@ -12,14 +16,7 @@ import {
 } from './minefield';
 import type { GameState, RevealResult } from './models';
 import { PlayerRecord } from './player-record';
-import {
-  formatMines,
-  formatTime,
-  getMinesRemaining,
-  getSafeRemaining,
-  getStatusDetail,
-  isTerminalStatus,
-} from './presentation/functions';
+import { formatMines, formatTime } from './format';
 import type { DifficultyKey } from './types';
 
 @Service()
@@ -37,13 +34,9 @@ export class GameSession {
   readonly flagMode = this.#flagMode.asReadonly();
   readonly announcement = this.#announcement.asReadonly();
 
-  /** Player prefs / history — exposed for existing templates that bind through session. */
-  readonly playerRecord = this.#playerRecord;
-  readonly theme = this.#playerRecord.theme;
-
   readonly difficulty = computed(() => this.#game().difficulty);
   readonly status = computed(() => this.#game().status);
-  readonly statusDetail = computed(() => getStatusDetail(this.status()));
+  readonly statusDetail = computed(() => STATUS_DETAILS[this.status()]);
   readonly minesRemainingLabel = computed(() => formatMines(getMinesRemaining(this.#game())));
   readonly elapsedLabel = computed(() =>
     formatTime(getCurrentElapsedSeconds(this.#game(), this.#now())),
@@ -53,12 +46,6 @@ export class GameSession {
   readonly isPaused = computed(() => this.status() === 'paused');
   readonly pauseEnabled = computed(
     () => this.status() === 'playing' || this.status() === 'paused',
-  );
-  readonly currentRunStats = computed(() => this.#playerRecord.runStatsFor(this.difficulty()));
-  readonly bestTimeLabel = computed(() => this.#playerRecord.bestTimeLabel(this.difficulty()));
-  readonly bestCopy = computed(() => this.#playerRecord.bestCopy(this.difficulty()));
-  readonly bestMeterPercent = computed(() =>
-    this.#playerRecord.bestMeterPercent(this.difficulty()),
   );
   readonly difficulties = DIFFICULTIES;
 
@@ -95,10 +82,6 @@ export class GameSession {
       this.#game.set(pauseGame(game, now));
       this.#clock.stopTick();
     }
-  }
-
-  toggleTheme(): void {
-    this.#playerRecord.toggleTheme();
   }
 
   handlePrimaryAction(index: number): void {

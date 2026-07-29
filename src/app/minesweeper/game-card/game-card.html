@@ -4,7 +4,18 @@
   [status]="status()"
   [statusLabel]="statusLabel()"
 />
-<mine-board-frame [paused]="paused()" />
+<div class="board-frame">
+  <div class="board-wrap">
+    <mine-board class="board" />
+    @if (paused()) {
+      <div class="pause-overlay">
+        <span class="pause-symbol" aria-hidden="true">Ⅱ</span>
+        <strong>Game paused</strong>
+        <span>Take a breath, then pick up where you left off.</span>
+      </div>
+    }
+  </div>
+</div>
 <mine-game-controls
   [message]="statusMessage()"
   [flagMode]="flagMode()"

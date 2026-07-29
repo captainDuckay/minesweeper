@@ -6,7 +6,7 @@ import {
 } from './constants';
 import type { RunStats } from './models';
 import { PLAYER_STORE } from './player-store';
-import { formatTime } from './presentation/format';
+import { formatTime } from './format';
 import { getRunStatsForDifficulty } from './storage/functions';
 import { THEME_SURFACE } from './theme-surface';
 import type { DifficultyKey, Theme } from './types';

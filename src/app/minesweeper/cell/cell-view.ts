@@ -1,15 +1,5 @@
-import { STATUS_DETAILS } from '../constants';
-import type { Cell, GameState, StatusDetail } from '../models';
+import type { Cell } from '../models';
 import type { GameStatus } from '../types';
-
-export { formatMines, formatTime } from './format';
-
-export const getStatusDetail = (status: GameStatus): StatusDetail => STATUS_DETAILS[status];
-
-export const getSafeRemaining = (game: GameState): number =>
-  Math.max(0, game.cells.length - game.mineCount - game.revealedCount);
-
-export const getMinesRemaining = (game: GameState): number => game.mineCount - game.flagsCount;
 
 export const getCellLabel = (
   cell: Cell,
@@ -65,6 +55,3 @@ export const getCellDisplay = (
   }
   return '';
 };
-
-export const isTerminalStatus = (status: GameStatus): boolean =>
-  status === 'lost' || status === 'won';

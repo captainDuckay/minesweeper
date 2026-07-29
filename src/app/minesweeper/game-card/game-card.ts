@@ -1,12 +1,12 @@
 import { Component, input, output } from '@angular/core';
-import { BoardFrame } from '../board-frame/board-frame';
+import { Board } from '../board/board';
 import { GameControls } from '../game-controls/game-controls';
 import { GameStatusBar } from '../game-status-bar/game-status-bar';
 import type { GameStatus } from '../types';
 
 @Component({
   selector: 'mine-game-card',
-  imports: [GameStatusBar, BoardFrame, GameControls],
+  imports: [GameStatusBar, Board, GameControls],
   templateUrl: './game-card.html',
   styleUrl: './game-card.css',
   host: {

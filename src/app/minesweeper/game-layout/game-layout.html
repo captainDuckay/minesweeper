@@ -19,14 +19,21 @@
       (flagModeToggle)="session.toggleFlagMode()"
       (pauseToggle)="session.togglePause()"
     />
-    <mine-board-hint />
+    <p class="board-hint" id="board-hint">
+      <span aria-hidden="true">⌘</span>
+      Left click to reveal
+      <span class="hint-separator">·</span>
+      Right click / long press to flag
+      <span class="hint-separator">·</span>
+      Click a number to chord
+    </p>
   </div>
 
   <mine-info-column
-    [bestTimeLabel]="session.bestTimeLabel()"
-    [bestCopy]="session.bestCopy()"
-    [meterPercent]="session.bestMeterPercent()"
+    [bestTimeLabel]="bestTimeLabel()"
+    [bestCopy]="bestCopy()"
+    [meterPercent]="bestMeterPercent()"
     [safeRemaining]="session.safeRemaining()"
-    [runStats]="session.currentRunStats()"
+    [runStats]="runStats()"
   />
 </section>

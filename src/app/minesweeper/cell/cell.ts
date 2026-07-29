@@ -1,11 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import type { Cell as CellModel } from '../models';
-import {
-  getCellClasses,
-  getCellDisplay,
-  getCellLabel,
-} from '../presentation/functions';
 import type { GameStatus } from '../types';
+import { getCellClasses, getCellDisplay, getCellLabel } from './cell-view';
 
 @Component({
   selector: 'mine-cell',

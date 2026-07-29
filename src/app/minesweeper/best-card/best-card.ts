@@ -1,9 +1,7 @@
 import { Component, input } from '@angular/core';
-import { InfoCardHeading } from '../info-card-heading/info-card-heading';
 
 @Component({
   selector: 'mine-best-card',
-  imports: [InfoCardHeading],
   templateUrl: './best-card.html',
   styleUrl: './best-card.css',
 })

@@ -11,6 +11,75 @@
   border-bottom: 1px solid var(--line);
 }
 
+.stat-block {
+  display: block;
+}
+
+.stat-block-right {
+  text-align: right;
+}
+
+.stat-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--faint);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.mono {
+  font-family: "DM Mono", monospace;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 11px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.status-pill[data-status="won"] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.status-pill[data-status="lost"] {
+  color: var(--coral);
+  border-color: color-mix(in srgb, var(--coral) 35%, transparent);
+}
+
+.status-pill[data-status="lost"] .status-dot {
+  background: var(--coral);
+  box-shadow: 0 0 11px color-mix(in srgb, var(--coral) 65%, transparent);
+}
+
+.status-pill[data-status="paused"] .status-dot {
+  background: var(--violet);
+  box-shadow: 0 0 11px color-mix(in srgb, var(--violet) 65%, transparent);
+}
+
 @media (max-width: 650px) {
   .game-card-topline {
     padding: 15px;
@@ -20,5 +89,13 @@
 @media (max-width: 400px) {
   .game-card-topline {
     gap: 8px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .status-pill {
+    padding-inline: 8px;
   }
 }

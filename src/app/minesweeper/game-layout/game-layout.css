@@ -13,8 +13,33 @@
   min-width: 0;
 }
 
+.board-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 13px 0 0;
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.board-hint span:first-child {
+  color: var(--accent);
+}
+
+.hint-separator {
+  color: var(--line-bright);
+}
+
 @media (max-width: 900px) {
   .game-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .board-hint {
+    flex-wrap: wrap;
+    line-height: 1.5;
   }
 }

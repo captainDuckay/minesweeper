@@ -305,3 +305,11 @@ export const resumeGame = (state: GameState, now: number = Date.now()): GameStat
 
 export const getCurrentElapsedSeconds = (state: GameState, now: number = Date.now()): number =>
   getElapsedSeconds(state, now);
+
+export const isTerminalStatus = (status: GameState['status']): boolean =>
+  status === 'lost' || status === 'won';
+
+export const getSafeRemaining = (game: GameState): number =>
+  Math.max(0, game.cells.length - game.mineCount - game.revealedCount);
+
+export const getMinesRemaining = (game: GameState): number => game.mineCount - game.flagsCount;

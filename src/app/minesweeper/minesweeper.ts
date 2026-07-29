@@ -3,6 +3,7 @@ import { GameLayout } from './game-layout/game-layout';
 import { GameSession } from './game-session';
 import { Hero } from './hero/hero';
 import { LiveRegion } from './live-region/live-region';
+import { PlayerRecord } from './player-record';
 import { SiteFooter } from './site-footer/site-footer';
 import { Topbar } from './topbar/topbar';
 
@@ -14,4 +15,5 @@ import { Topbar } from './topbar/topbar';
 })
 export class Minesweeper {
   protected readonly session = inject(GameSession);
+  protected readonly playerRecord = inject(PlayerRecord);
 }
