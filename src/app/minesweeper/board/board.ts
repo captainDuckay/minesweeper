@@ -1,11 +1,15 @@
 import { Component, ElementRef, inject, signal } from '@angular/core';
-import {
-  CLICK_SUPPRESSION_RESET_MS,
-  LONG_PRESS_MS,
-} from '../constants';
 import { Cell } from '../cell/cell';
 import { GameSession } from '../game-session';
-import { isTerminalStatus } from '../presentation/functions';
+import {
+  clickSuppressionResetMs,
+  initialBoardInputState,
+  longPressMs,
+  reduceBoardInput,
+  tabIndexFor,
+  type BoardInputState,
+  type BoardIntent,
+} from './board-input';
 
 @Component({
   selector: 'mine-board',
@@ -25,100 +29,108 @@ export class Board {
   protected readonly session = inject(GameSession);
   readonly #host = inject(ElementRef<HTMLElement>);
 
-  readonly #focusedIndex = signal(0);
+  readonly #input = signal(initialBoardInputState());
   #longPressTimerId: number | null = null;
-  #suppressedClickIndex: number | null = null;
+  #suppressionTimerId: number | null = null;
 
   protected onPrimaryAction(index: number): void {
-    if (this.#suppressedClickIndex === index) {
-      this.#suppressedClickIndex = null;
-      return;
-    }
-    this.session.handlePrimaryAction(index);
+    this.#dispatch({ kind: 'click', index });
   }
 
   protected onFlag(index: number): void {
-    this.session.flag(index);
+    this.#dispatch({ kind: 'contextFlag', index });
   }
 
   protected onPointerDown(event: PointerEvent, index: number): void {
-    if (event.pointerType !== 'touch') {
-      return;
-    }
-    this.#clearLongPressTimer();
-    this.#longPressTimerId = window.setTimeout(() => {
-      this.#longPressTimerId = null;
-      this.#suppressedClickIndex = index;
-      this.session.flag(index);
-    }, LONG_PRESS_MS);
+    this.#dispatch({ kind: 'pointerDown', index, pointerType: event.pointerType });
   }
 
   protected onPointerEnd(event: PointerEvent, index: number): void {
-    if (event.pointerType !== 'touch') {
-      return;
-    }
-    this.#clearLongPressTimer();
-    if (this.#suppressedClickIndex !== index) {
-      return;
-    }
-    window.setTimeout(() => {
-      if (this.#suppressedClickIndex === index) {
-        this.#suppressedClickIndex = null;
-      }
-    }, CLICK_SUPPRESSION_RESET_MS);
+    this.#dispatch({ kind: 'pointerEnd', index, pointerType: event.pointerType });
   }
 
   protected onKeydown(event: KeyboardEvent, index: number): void {
-    const game = this.session.game();
-    if (isTerminalStatus(game.status) || game.status === 'paused') {
-      return;
-    }
-
-    if (event.key.toLowerCase() === 'f') {
+    if (
+      event.key === 'ArrowLeft' ||
+      event.key === 'ArrowRight' ||
+      event.key === 'ArrowUp' ||
+      event.key === 'ArrowDown' ||
+      event.key.toLowerCase() === 'f' ||
+      event.key === 'Enter'
+    ) {
       event.preventDefault();
-      this.session.flag(index);
-      return;
     }
-
-    const movement: Record<string, readonly [number, number]> = {
-      ArrowLeft: [0, -1],
-      ArrowRight: [0, 1],
-      ArrowUp: [-1, 0],
-      ArrowDown: [1, 0],
-    };
-    const delta = movement[event.key];
-    if (delta) {
-      event.preventDefault();
-      const row = Math.floor(index / game.columns);
-      const column = index % game.columns;
-      const nextRow = row + delta[0];
-      const nextColumn = column + delta[1];
-      if (
-        nextRow < 0 ||
-        nextRow >= game.rows ||
-        nextColumn < 0 ||
-        nextColumn >= game.columns
-      ) {
-        return;
-      }
-      this.#focusCell(nextRow * game.columns + nextColumn);
-      return;
-    }
-
-    if (event.key === 'Enter' && game.cells[index]?.isRevealed) {
-      event.preventDefault();
-      this.session.handlePrimaryAction(index);
-    }
+    this.#dispatch({ kind: 'key', index, key: event.key });
   }
 
   protected tabIndexFor(index: number): number {
-    const maxIndex = this.session.game().cells.length - 1;
-    const focusedIndex = Math.min(this.#focusedIndex(), maxIndex);
-    return index === focusedIndex ? 0 : -1;
+    return tabIndexFor(this.#input(), index, this.session.game().cells.length);
+  }
+
+  #dispatch(
+    event:
+      | { kind: 'click'; index: number }
+      | { kind: 'contextFlag'; index: number }
+      | { kind: 'key'; index: number; key: string }
+      | { kind: 'pointerDown'; index: number; pointerType: string }
+      | { kind: 'pointerEnd'; index: number; pointerType: string },
+  ): void {
+    const result = reduceBoardInput(this.#input(), this.session.game(), event);
+    this.#input.set(result.state);
+    this.#applySchedules(result.scheduleLongPressIndex, result.scheduleClearSuppressionIndex);
+    for (const intent of result.intents) {
+      this.#applyIntent(intent);
+    }
+  }
+
+  #applySchedules(
+    longPressIndex: number | null,
+    clearSuppressionIndex: number | null,
+  ): void {
+    this.#clearLongPressTimer();
+    if (longPressIndex !== null) {
+      this.#longPressTimerId = window.setTimeout(() => {
+        this.#longPressTimerId = null;
+        const result = reduceBoardInput(this.#input(), this.session.game(), {
+          kind: 'longPressFire',
+          index: longPressIndex,
+        });
+        this.#input.set(result.state);
+        for (const intent of result.intents) {
+          this.#applyIntent(intent);
+        }
+      }, longPressMs);
+    }
+
+    if (clearSuppressionIndex !== null) {
+      if (this.#suppressionTimerId !== null) {
+        window.clearTimeout(this.#suppressionTimerId);
+      }
+      this.#suppressionTimerId = window.setTimeout(() => {
+        this.#suppressionTimerId = null;
+        const result = reduceBoardInput(this.#input(), this.session.game(), {
+          kind: 'clearSuppression',
+          index: clearSuppressionIndex,
+        });
+        this.#input.set(result.state);
+      }, clickSuppressionResetMs);
+    }
+  }
+
+  #applyIntent(intent: BoardIntent): void {
+    if (intent.type === 'primary') {
+      this.session.handlePrimaryAction(intent.index);
+      return;
+    }
+    if (intent.type === 'flag') {
+      this.session.flag(intent.index);
+      return;
+    }
+    this.#focusCell(intent.index);
   }
 
   #focusCell(index: number): void {
-    this.#focusedIndex.set(index);
+    this.#input.update((state: BoardInputState) => ({ ...state, focusedIndex: index }));
     const target = this.#host.nativeElement.querySelector(
       `[data-index="${index}"]`,
     ) as HTMLElement | null;
