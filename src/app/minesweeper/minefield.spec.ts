@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  createGame,
+  createMinefield,
   getMinesRemaining,
   getSafeRemaining,
   isTerminalStatus,
@@ -21,7 +21,7 @@ const fixedRandom = (...values: number[]): (() => number) => {
 
 describe('minefield', () => {
   it('creates a ready minefield for the chosen difficulty', () => {
-    const game = createGame('beginner');
+    const game = createMinefield('beginner');
     expect(game.status).toBe('ready');
     expect(game.rows).toBe(9);
     expect(game.columns).toBe(9);
@@ -32,8 +32,8 @@ describe('minefield', () => {
   });
 
   it('starts on first reveal and never plants the first cell as a mine', () => {
-    const ready = createGame('beginner');
-    const { state, revealedIndices } = revealCell(ready, 0, fixedRandom(0.99), 1_000);
+    const ready = createMinefield('beginner');
+    const { minefield: state, revealedIndices } = revealCell(ready, 0, fixedRandom(0.99), 1_000);
     expect(state.cells[0]?.isMine).toBe(false);
     expect(state.cells[0]?.isRevealed).toBe(true);
     expect(revealedIndices.length).toBeGreaterThan(0);
@@ -44,7 +44,7 @@ describe('minefield', () => {
   });
 
   it('toggles flags without exceeding mine count', () => {
-    let game = createGame('beginner');
+    let game = createMinefield('beginner');
     game = toggleFlag(game, 0);
     expect(game.cells[0]?.isFlagged).toBe(true);
     expect(getMinesRemaining(game)).toBe(9);
@@ -52,7 +52,7 @@ describe('minefield', () => {
 
   it('pauses and resumes elapsed time bookkeeping', () => {
     const playing = {
-      ...createGame('beginner'),
+      ...createMinefield('beginner'),
       status: 'playing' as const,
       startedAt: 1_000,
       elapsedSeconds: 0,

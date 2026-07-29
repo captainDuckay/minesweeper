@@ -1,6 +1,6 @@
 import { CLICK_SUPPRESSION_RESET_MS, LONG_PRESS_MS } from '../constants';
 import { isTerminalStatus } from '../minefield';
-import type { GameState } from '../models';
+import type { Minefield } from '../models';
 
 export type BoardIntent =
   | { readonly type: 'primary'; readonly index: number }
@@ -48,7 +48,7 @@ const movement: Record<string, readonly [number, number]> = {
 };
 
 const neighborIndex = (
-  game: GameState,
+  game: Minefield,
   index: number,
   delta: readonly [number, number],
 ): number | null => {
@@ -69,7 +69,7 @@ const neighborIndex = (
 
 export const reduceBoardInput = (
   state: BoardInputState,
-  game: GameState,
+  game: Minefield,
   event: BoardInputEvent,
 ): BoardInputResult => {
   const idle = {

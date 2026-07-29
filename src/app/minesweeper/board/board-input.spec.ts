@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame } from '../minefield';
+import { createMinefield } from '../minefield';
 import {
   initialBoardInputState,
   reduceBoardInput,
@@ -8,7 +8,7 @@ import {
 
 describe('board input policy', () => {
   it('emits primary on click when not suppressed', () => {
-    const game = createGame('beginner');
+    const game = createMinefield('beginner');
     const result = reduceBoardInput(initialBoardInputState(), game, {
       kind: 'click',
       index: 3,
@@ -17,7 +17,7 @@ describe('board input policy', () => {
   });
 
   it('suppresses the click after long-press fire', () => {
-    const game = createGame('beginner');
+    const game = createMinefield('beginner');
     let state = initialBoardInputState();
     const down = reduceBoardInput(state, game, {
       kind: 'pointerDown',
@@ -34,7 +34,7 @@ describe('board input policy', () => {
   });
 
   it('moves focus with arrows and flags with f', () => {
-    const game = createGame('beginner');
+    const game = createMinefield('beginner');
     const right = reduceBoardInput(initialBoardInputState(0), game, {
       kind: 'key',
       index: 0,

@@ -15,7 +15,7 @@ export interface Cell {
   readonly adjacentMines: number;
 }
 
-export interface GameState {
+export interface Minefield {
   readonly difficulty: DifficultyKey;
   readonly rows: number;
   readonly columns: number;
@@ -30,7 +30,7 @@ export interface GameState {
 }
 
 export interface RevealResult {
-  readonly state: GameState;
+  readonly minefield: Minefield;
   readonly revealedIndices: readonly number[];
   readonly explodedIndex?: number;
 }

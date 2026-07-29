@@ -9,8 +9,8 @@ One tile on the minefield. May hide a mine, carry an adjacent-mine count, and be
 _Avoid_: Tile (in code/types), square
 
 **Minefield**:
-The board for one run: dimensions, mine placement, flags, reveals, and run status. In code the value type may still be named `GameState` until a dedicated rename pass.
-_Avoid_: Board state as a second domain name; grid; `functions` as the module name for rules
+The board for one run: dimensions, mine placement, flags, reveals, and run status. In code: the `Minefield` type and `createMinefield` transitions in the minefield module.
+_Avoid_: GameState, board state as a second domain name; grid; `functions` as the module name for rules
 
 **Run** / **Game session**:
 One attempt on a minefield at a chosen difficulty, from ready through playing/paused to won or lost.

@@ -4,7 +4,7 @@ import { DIFFICULTIES } from './constants';
 import { STATUS_DETAILS } from './constants';
 import {
   chordCell,
-  createGame,
+  createMinefield,
   getCurrentElapsedSeconds,
   getMinesRemaining,
   getSafeRemaining,
@@ -14,7 +14,7 @@ import {
   revealCell,
   toggleFlag,
 } from './minefield';
-import type { GameState, RevealResult } from './models';
+import type { Minefield, RevealResult } from './models';
 import { PlayerRecord } from './player-record';
 import { formatMines, formatTime } from './format';
 import type { DifficultyKey } from './types';
@@ -25,7 +25,7 @@ export class GameSession {
   readonly #clock = inject(CLOCK);
   readonly #playerRecord = inject(PlayerRecord);
 
-  readonly #game = signal<GameState>(createGame('beginner'));
+  readonly #game = signal<Minefield>(createMinefield('beginner'));
   readonly #flagMode = signal(false);
   readonly #announcement = signal('');
   readonly #now = signal(this.#clock.now());
@@ -55,7 +55,7 @@ export class GameSession {
 
   reset(nextDifficulty: DifficultyKey = this.difficulty()): void {
     this.#clock.stopTick();
-    this.#game.set(createGame(nextDifficulty));
+    this.#game.set(createMinefield(nextDifficulty));
     this.#flagMode.set(false);
     this.#now.set(this.#clock.now());
     this.#announce(`${DIFFICULTIES[nextDifficulty].label} game ready.`);
@@ -107,7 +107,7 @@ export class GameSession {
       return;
     }
     const result = revealCell(game, index, Math.random, this.#clock.now());
-    if (result.state === game && result.revealedIndices.length === 0) {
+    if (result.minefield === game && result.revealedIndices.length === 0) {
       return;
     }
     this.#applyRevealResult(result, game.status === 'ready');
@@ -125,22 +125,22 @@ export class GameSession {
 
   #applyRevealResult(result: RevealResult, startedFromReady = false): void {
     const previous = this.#game();
-    this.#game.set(result.state);
+    this.#game.set(result.minefield);
 
-    if (startedFromReady && result.state.status === 'playing') {
-      this.#playerRecord.recordPlayed(result.state.difficulty);
+    if (startedFromReady && result.minefield.status === 'playing') {
+      this.#playerRecord.recordPlayed(result.minefield.difficulty);
       this.#startTimer();
-    } else if (previous.status === 'ready' && result.state.status === 'playing') {
-      this.#playerRecord.recordPlayed(result.state.difficulty);
+    } else if (previous.status === 'ready' && result.minefield.status === 'playing') {
+      this.#playerRecord.recordPlayed(result.minefield.difficulty);
       this.#startTimer();
     }
 
-    if (result.state.status === 'won') {
-      this.#finishWon(result.state);
+    if (result.minefield.status === 'won') {
+      this.#finishWon(result.minefield);
       return;
     }
-    if (result.state.status === 'lost') {
-      this.#finishLost(result.state.difficulty);
+    if (result.minefield.status === 'lost') {
+      this.#finishLost(result.minefield.difficulty);
       return;
     }
     if (result.revealedIndices.length > 1) {
@@ -148,7 +148,7 @@ export class GameSession {
     }
   }
 
-  #finishWon(game: GameState): void {
+  #finishWon(game: Minefield): void {
     this.#clock.stopTick();
     const { isNewBest } = this.#playerRecord.recordWin(game.difficulty, game.elapsedSeconds);
     this.#announce(

@@ -1,5 +1,5 @@
 import { DIFFICULTIES, NEIGHBOR_OFFSETS } from './constants';
-import type { Cell, GameState, RevealResult } from './models';
+import type { Cell, Minefield, RevealResult } from './models';
 import type { DifficultyKey, Random } from './types';
 
 type DifficultyConfig = (typeof DIFFICULTIES)[DifficultyKey];
@@ -42,7 +42,7 @@ const createCells = (rows: number, columns: number): Cell[] =>
     adjacentMines: 0,
   }));
 
-export const createGame = (difficulty: DifficultyKey): GameState => {
+export const createMinefield = (difficulty: DifficultyKey): Minefield => {
   const { rows, columns, mines }: DifficultyConfig = DIFFICULTIES[difficulty];
   return {
     difficulty,
@@ -70,7 +70,7 @@ const shuffle = (items: readonly number[], random: Random): number[] => {
   return shuffled;
 };
 
-const seedCells = (state: GameState, safeIndex: number, random: Random): Cell[] => {
+const seedCells = (state: Minefield, safeIndex: number, random: Random): Cell[] => {
   const protectedIndices = new Set<number>([
     safeIndex,
     ...getNeighborIndices(safeIndex, state.rows, state.columns),
@@ -129,12 +129,12 @@ const revealSafeArea = (
   return revealedIndices;
 };
 
-const getElapsedSeconds = (state: GameState, now: number): number =>
+const getElapsedSeconds = (state: Minefield, now: number): number =>
   state.startedAt === null
     ? state.elapsedSeconds
     : state.elapsedSeconds + Math.max(0, Math.floor((now - state.startedAt) / 1000));
 
-const finishIfWon = (state: GameState, now: number): GameState => {
+const finishIfWon = (state: Minefield, now: number): Minefield => {
   const safeCellCount = state.cells.length - state.mineCount;
   if (state.revealedCount !== safeCellCount) {
     return state;
@@ -150,28 +150,28 @@ const finishIfWon = (state: GameState, now: number): GameState => {
 };
 
 export const startGame = (
-  state: GameState,
+  state: Minefield,
   firstIndex: number,
   random: Random = Math.random,
   now: number = Date.now(),
 ): RevealResult => {
   if (state.status !== 'ready' || !state.cells[firstIndex] || state.cells[firstIndex]!.isFlagged) {
-    return { state, revealedIndices: [] };
+    return { minefield: state, revealedIndices: [] };
   }
 
   const cells = seedCells(state, firstIndex, random);
   const revealedIndices = revealSafeArea(cells, firstIndex, state.rows, state.columns);
-  const nextState: GameState = {
+  const nextState: Minefield = {
     ...state,
     cells,
     status: 'playing',
     startedAt: now,
     revealedCount: revealedIndices.length,
   };
-  return { state: finishIfWon(nextState, now), revealedIndices };
+  return { minefield: finishIfWon(nextState, now), revealedIndices };
 };
 
-const revealMines = (state: GameState, explodedIndex: number, now: number): GameState => ({
+const revealMines = (state: Minefield, explodedIndex: number, now: number): Minefield => ({
   ...state,
   status: 'lost',
   elapsedSeconds: getElapsedSeconds(state, now),
@@ -184,14 +184,14 @@ const revealMines = (state: GameState, explodedIndex: number, now: number): Game
   })),
 });
 
-const revealPlayingCell = (state: GameState, index: number, now: number): RevealResult => {
+const revealPlayingCell = (state: Minefield, index: number, now: number): RevealResult => {
   const cell = state.cells[index];
   if (!cell || cell.isRevealed || cell.isFlagged || state.status !== 'playing') {
-    return { state, revealedIndices: [] };
+    return { minefield: state, revealedIndices: [] };
   }
   if (cell.isMine) {
     return {
-      state: revealMines(state, index, now),
+      minefield: revealMines(state, index, now),
       revealedIndices: [index],
       explodedIndex: index,
     };
@@ -199,16 +199,16 @@ const revealPlayingCell = (state: GameState, index: number, now: number): Reveal
 
   const cells = state.cells.map((currentCell) => ({ ...currentCell }));
   const revealedIndices = revealSafeArea(cells, index, state.rows, state.columns);
-  const nextState: GameState = {
+  const nextState: Minefield = {
     ...state,
     cells,
     revealedCount: state.revealedCount + revealedIndices.length,
   };
-  return { state: finishIfWon(nextState, now), revealedIndices };
+  return { minefield: finishIfWon(nextState, now), revealedIndices };
 };
 
 export const revealCell = (
-  state: GameState,
+  state: Minefield,
   index: number,
   random: Random = Math.random,
   now: number = Date.now(),
@@ -219,7 +219,7 @@ export const revealCell = (
   return revealPlayingCell(state, index, now);
 };
 
-export const toggleFlag = (state: GameState, index: number): GameState => {
+export const toggleFlag = (state: Minefield, index: number): Minefield => {
   const cell = state.cells[index];
   if (
     !cell ||
@@ -246,13 +246,13 @@ export const toggleFlag = (state: GameState, index: number): GameState => {
 };
 
 export const chordCell = (
-  state: GameState,
+  state: Minefield,
   index: number,
   now: number = Date.now(),
 ): RevealResult => {
   const cell = state.cells[index];
   if (!cell || !cell.isRevealed || state.status !== 'playing') {
-    return { state, revealedIndices: [] };
+    return { minefield: state, revealedIndices: [] };
   }
 
   const neighbors = getNeighborIndices(index, state.rows, state.columns);
@@ -260,7 +260,7 @@ export const chordCell = (
     (neighborIndex) => state.cells[neighborIndex]!.isFlagged,
   ).length;
   if (flaggedCount !== cell.adjacentMines) {
-    return { state, revealedIndices: [] };
+    return { minefield: state, revealedIndices: [] };
   }
 
   const cellsToReveal = neighbors.filter(
@@ -272,7 +272,7 @@ export const chordCell = (
   );
   if (explodedIndex !== undefined) {
     return {
-      state: revealMines(state, explodedIndex, now),
+      minefield: revealMines(state, explodedIndex, now),
       revealedIndices: [explodedIndex],
       explodedIndex,
     };
@@ -282,15 +282,15 @@ export const chordCell = (
   const revealedIndices = cellsToReveal.flatMap((neighborIndex) =>
     revealSafeArea(cells, neighborIndex, state.rows, state.columns),
   );
-  const nextState: GameState = {
+  const nextState: Minefield = {
     ...state,
     cells,
     revealedCount: state.revealedCount + revealedIndices.length,
   };
-  return { state: finishIfWon(nextState, now), revealedIndices };
+  return { minefield: finishIfWon(nextState, now), revealedIndices };
 };
 
-export const pauseGame = (state: GameState, now: number = Date.now()): GameState =>
+export const pauseGame = (state: Minefield, now: number = Date.now()): Minefield =>
   state.status !== 'playing'
     ? state
     : {
@@ -300,16 +300,16 @@ export const pauseGame = (state: GameState, now: number = Date.now()): GameState
         startedAt: null,
       };
 
-export const resumeGame = (state: GameState, now: number = Date.now()): GameState =>
+export const resumeGame = (state: Minefield, now: number = Date.now()): Minefield =>
   state.status !== 'paused' ? state : { ...state, status: 'playing', startedAt: now };
 
-export const getCurrentElapsedSeconds = (state: GameState, now: number = Date.now()): number =>
+export const getCurrentElapsedSeconds = (state: Minefield, now: number = Date.now()): number =>
   getElapsedSeconds(state, now);
 
-export const isTerminalStatus = (status: GameState['status']): boolean =>
+export const isTerminalStatus = (status: Minefield['status']): boolean =>
   status === 'lost' || status === 'won';
 
-export const getSafeRemaining = (game: GameState): number =>
+export const getSafeRemaining = (game: Minefield): number =>
   Math.max(0, game.cells.length - game.mineCount - game.revealedCount);
 
-export const getMinesRemaining = (game: GameState): number => game.mineCount - game.flagsCount;
+export const getMinesRemaining = (game: Minefield): number => game.mineCount - game.flagsCount;
