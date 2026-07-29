@@ -1,5 +1,6 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
-import { DIFFICULTIES, TIMER_TICK_MS } from './constants';
+import { CLOCK } from './clock';
+import { DIFFICULTIES } from './constants';
 import {
   chordCell,
   createGame,
@@ -8,48 +9,37 @@ import {
   resumeGame,
   revealCell,
   toggleFlag,
-} from './functions';
-import type { GameState, RevealResult, RunStats } from './models';
+} from './minefield';
+import type { GameState, RevealResult } from './models';
+import { PlayerRecord } from './player-record';
 import {
   formatMines,
   formatTime,
-  getBestCopy,
-  getBestMeterPercent,
   getMinesRemaining,
   getSafeRemaining,
   getStatusDetail,
   isTerminalStatus,
 } from './presentation/functions';
-import {
-  getRunStatsForDifficulty,
-  incrementRunStat,
-  readBestTimes,
-  readRunStats,
-  readTheme,
-  writeBestTime,
-  writeTheme,
-} from './storage/functions';
-import type { DifficultyKey, Theme } from './types';
+import type { DifficultyKey } from './types';
 
 @Service()
 export class GameSession {
   readonly #destroyRef = inject(DestroyRef);
-  readonly #storage = globalThis.localStorage;
+  readonly #clock = inject(CLOCK);
+  readonly #playerRecord = inject(PlayerRecord);
 
   readonly #game = signal<GameState>(createGame('beginner'));
   readonly #flagMode = signal(false);
   readonly #announcement = signal('');
-  readonly #now = signal(Date.now());
-  readonly #bestTimes = signal(readBestTimes(this.#storage));
-  readonly #runStats = signal(readRunStats(this.#storage));
-  readonly #theme = signal<Theme>(readTheme(this.#storage) ?? 'dark');
-
-  #timerId: number | null = null;
+  readonly #now = signal(this.#clock.now());
 
   readonly game = this.#game.asReadonly();
   readonly flagMode = this.#flagMode.asReadonly();
   readonly announcement = this.#announcement.asReadonly();
-  readonly theme = this.#theme.asReadonly();
+
+  /** Player prefs / history — exposed for existing templates that bind through session. */
+  readonly playerRecord = this.#playerRecord;
+  readonly theme = this.#playerRecord.theme;
 
   readonly difficulty = computed(() => this.#game().difficulty);
   readonly status = computed(() => this.#game().status);
@@ -64,36 +54,27 @@ export class GameSession {
   readonly pauseEnabled = computed(
     () => this.status() === 'playing' || this.status() === 'paused',
   );
-  readonly currentRunStats = computed<RunStats>(() =>
-    getRunStatsForDifficulty(this.#runStats(), this.difficulty()),
+  readonly currentRunStats = computed(() => this.#playerRecord.runStatsFor(this.difficulty()));
+  readonly bestTimeLabel = computed(() => this.#playerRecord.bestTimeLabel(this.difficulty()));
+  readonly bestCopy = computed(() => this.#playerRecord.bestCopy(this.difficulty()));
+  readonly bestMeterPercent = computed(() =>
+    this.#playerRecord.bestMeterPercent(this.difficulty()),
   );
-  readonly bestTime = computed(() => this.#bestTimes()[this.difficulty()]);
-  readonly bestTimeLabel = computed(() => {
-    const bestTime = this.bestTime();
-    return bestTime === undefined ? '—:——' : formatTime(bestTime);
-  });
-  readonly bestCopy = computed(() => getBestCopy(this.difficulty(), this.bestTime()));
-  readonly bestMeterPercent = computed(() => getBestMeterPercent(this.bestTime()));
   readonly difficulties = DIFFICULTIES;
 
   constructor() {
-    this.#applyTheme(this.#theme());
-    this.#destroyRef.onDestroy(() => this.#stopTimer());
+    this.#destroyRef.onDestroy(() => this.#clock.stopTick());
   }
 
   reset(nextDifficulty: DifficultyKey = this.difficulty()): void {
-    this.#stopTimer();
+    this.#clock.stopTick();
     this.#game.set(createGame(nextDifficulty));
     this.#flagMode.set(false);
-    this.#now.set(Date.now());
+    this.#now.set(this.#clock.now());
     this.#announce(`${DIFFICULTIES[nextDifficulty].label} game ready.`);
   }
 
   setDifficulty(difficulty: DifficultyKey): void {
-    if (difficulty === this.difficulty()) {
-      this.reset(difficulty);
-      return;
-    }
     this.reset(difficulty);
   }
 
@@ -104,22 +85,20 @@ export class GameSession {
 
   togglePause(): void {
     const game = this.#game();
+    const now = this.#clock.now();
     if (game.status === 'paused') {
-      this.#game.set(resumeGame(game));
+      this.#game.set(resumeGame(game, now));
       this.#startTimer();
       return;
     }
     if (game.status === 'playing') {
-      this.#game.set(pauseGame(game));
-      this.#stopTimer();
+      this.#game.set(pauseGame(game, now));
+      this.#clock.stopTick();
     }
   }
 
   toggleTheme(): void {
-    const nextTheme: Theme = this.#theme() === 'light' ? 'dark' : 'light';
-    this.#theme.set(nextTheme);
-    writeTheme(this.#storage, nextTheme);
-    this.#applyTheme(nextTheme);
+    this.#playerRecord.toggleTheme();
   }
 
   handlePrimaryAction(index: number): void {
@@ -133,7 +112,7 @@ export class GameSession {
     }
     const cell = game.cells[index];
     if (cell?.isRevealed) {
-      this.#applyRevealResult(chordCell(game, index));
+      this.#applyRevealResult(chordCell(game, index, this.#clock.now()));
       return;
     }
     this.reveal(index);
@@ -144,7 +123,7 @@ export class GameSession {
     if (isTerminalStatus(game.status) || game.status === 'paused') {
       return;
     }
-    const result = revealCell(game, index);
+    const result = revealCell(game, index, Math.random, this.#clock.now());
     if (result.state === game && result.revealedIndices.length === 0) {
       return;
     }
@@ -166,10 +145,10 @@ export class GameSession {
     this.#game.set(result.state);
 
     if (startedFromReady && result.state.status === 'playing') {
-      this.#recordStat('played');
+      this.#playerRecord.recordPlayed(result.state.difficulty);
       this.#startTimer();
     } else if (previous.status === 'ready' && result.state.status === 'playing') {
-      this.#recordStat('played');
+      this.#playerRecord.recordPlayed(result.state.difficulty);
       this.#startTimer();
     }
 
@@ -178,7 +157,7 @@ export class GameSession {
       return;
     }
     if (result.state.status === 'lost') {
-      this.#finishLost();
+      this.#finishLost(result.state.difficulty);
       return;
     }
     if (result.revealedIndices.length > 1) {
@@ -187,16 +166,8 @@ export class GameSession {
   }
 
   #finishWon(game: GameState): void {
-    this.#stopTimer();
-    this.#recordStat('wins');
-    const nextBestTimes = writeBestTime(
-      this.#storage,
-      this.#bestTimes(),
-      game.difficulty,
-      game.elapsedSeconds,
-    );
-    const isNewBest = nextBestTimes !== this.#bestTimes();
-    this.#bestTimes.set(nextBestTimes);
+    this.#clock.stopTick();
+    const { isNewBest } = this.#playerRecord.recordWin(game.difficulty, game.elapsedSeconds);
     this.#announce(
       isNewBest
         ? `Board cleared in ${formatTime(game.elapsedSeconds)}. New best time.`
@@ -204,43 +175,19 @@ export class GameSession {
     );
   }
 
-  #finishLost(): void {
-    this.#stopTimer();
-    this.#recordStat('losses');
+  #finishLost(difficulty: DifficultyKey): void {
+    this.#clock.stopTick();
+    this.#playerRecord.recordLoss(difficulty);
     this.#announce('Mine detonated. The board is revealed.');
   }
 
-  #recordStat(stat: 'played' | 'wins' | 'losses'): void {
-    this.#runStats.set(
-      incrementRunStat(this.#storage, this.#runStats(), this.difficulty(), stat),
-    );
-  }
-
   #startTimer(): void {
-    this.#stopTimer();
-    this.#now.set(Date.now());
-    this.#timerId = window.setInterval(() => {
-      this.#now.set(Date.now());
-    }, TIMER_TICK_MS);
-  }
-
-  #stopTimer(): void {
-    if (this.#timerId === null) {
-      return;
-    }
-    window.clearInterval(this.#timerId);
-    this.#timerId = null;
+    this.#clock.startTick(() => {
+      this.#now.set(this.#clock.now());
+    });
   }
 
   #announce(message: string): void {
     this.#announcement.set(message);
-  }
-
-  #applyTheme(theme: Theme): void {
-    if (theme === 'light') {
-      document.documentElement.dataset['theme'] = 'light';
-      return;
-    }
-    delete document.documentElement.dataset['theme'];
   }
 }

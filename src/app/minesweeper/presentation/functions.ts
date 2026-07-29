@@ -1,17 +1,8 @@
-import {
-  BEST_METER_MIN_PERCENT,
-  BEST_METER_TIME_SCALE,
-  DIFFICULTIES,
-  STATUS_DETAILS,
-} from '../constants';
+import { STATUS_DETAILS } from '../constants';
 import type { Cell, GameState, StatusDetail } from '../models';
-import type { DifficultyKey, GameStatus } from '../types';
+import type { GameStatus } from '../types';
 
-export const formatTime = (seconds: number): string =>
-  `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-
-export const formatMines = (count: number): string =>
-  String(Math.max(0, count)).padStart(3, '0');
+export { formatMines, formatTime } from './format';
 
 export const getStatusDetail = (status: GameStatus): StatusDetail => STATUS_DETAILS[status];
 
@@ -19,24 +10,6 @@ export const getSafeRemaining = (game: GameState): number =>
   Math.max(0, game.cells.length - game.mineCount - game.revealedCount);
 
 export const getMinesRemaining = (game: GameState): number => game.mineCount - game.flagsCount;
-
-export const getBestMeterPercent = (bestTime: number | undefined): number => {
-  if (bestTime === undefined) {
-    return 0;
-  }
-  return Math.max(
-    BEST_METER_MIN_PERCENT,
-    Math.min(100, 100 - bestTime / BEST_METER_TIME_SCALE),
-  );
-};
-
-export const getBestCopy = (
-  difficulty: DifficultyKey,
-  bestTime: number | undefined,
-): string =>
-  bestTime === undefined
-    ? 'Clear a board to set your first record.'
-    : `${DIFFICULTIES[difficulty].label} pace. Can you shave off a second?`;
 
 export const getCellLabel = (
   cell: Cell,
