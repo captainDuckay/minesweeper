@@ -26,6 +26,7 @@
     "@angular/compiler-cli": "^22.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.143.0"
   }
 }
