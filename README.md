@@ -22,4 +22,4 @@ pnpm build
 pnpm exec wrangler pages deploy dist/minesweeper/browser --project-name minesweeper --branch main
 ```
 
-`pnpm deploy` runs both steps. Wrangler needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Pages Edit) in the environment.
+`pnpm run deploy` runs both steps. Wrangler needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Pages Edit) in the environment.
