@@ -1,59 +1,25 @@
 # Minesweeper
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
+Single-player minefield clearing: a live run on a board, plus the player's lasting record and preferences.
 
-## Development server
+Play it at https://minesweeper.play.captains-chest.com, part of the [Captain's Chest Playground](https://play.captains-chest.com).
+Built with Angular, pnpm and TypeScript; the domain language is in [CONTEXT.md](CONTEXT.md).
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Develop
 
 ```bash
-ng generate component component-name
+pnpm install
+pnpm start     # http://localhost:4200
+pnpm test      # Vitest
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Build and deploy
+
+The site is static files in `dist/minesweeper/browser`, hosted on the Cloudflare Pages project `minesweeper`.
 
 ```bash
-ng generate --help
+pnpm build
+pnpm exec wrangler pages deploy dist/minesweeper/browser --project-name minesweeper --branch main
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+`pnpm run deploy` runs both steps. Wrangler needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Pages Edit) in the environment.
